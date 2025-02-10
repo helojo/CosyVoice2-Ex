@@ -8,7 +8,7 @@ param (
 # 设置变量
 $ProjectName = "CosyVoice2-Ex"
 $CondaEnvName = "cosyvoice"
-$ProjectRoot = Split-Path -Parent $PSScriptRoot
+$ProjectRoot = $PSScriptRoot
 $TempDir = Join-Path $ProjectRoot ".build_temp"
 $OutputDir = Join-Path $TempDir "${ProjectName}_Portable"
 $EnvTarFile = Join-Path $TempDir "env.tar.gz"

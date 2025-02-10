@@ -56,4 +56,4 @@ output.pt
 
 .history
 .build_temp
-!tools/build_portable.ps1
+!build_portable.ps1

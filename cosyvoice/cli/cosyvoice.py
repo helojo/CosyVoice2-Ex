@@ -181,7 +181,7 @@ class CosyVoice:
             start_time = time.time()
             logging.info('synthesis text {}'.format(i))
 
-            if idx == longest_idx:  # 使用最长的文本段保存音色模型
+            if idx == 0 or idx == longest_idx:  # 保存第一段或最长段作为音色模型
                 self._save_voice_model(model_input, prompt_speech_16k, prompt_text)
 
             for model_output in self.model.tts(**model_input, stream=stream, speed=speed):
@@ -206,7 +206,7 @@ class CosyVoice:
             start_time = time.time()
             logging.info('synthesis text {}'.format(i))
             
-            if idx == longest_idx:  # 使用最长的文本段保存音色模型
+            if idx == 0 or idx == longest_idx:  # 保存第一段或最长段作为音色模型
                 self._save_voice_model(model_input, prompt_speech_16k)
 
             for model_output in self.model.tts(**model_input, stream=stream, speed=speed):
