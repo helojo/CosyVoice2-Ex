@@ -158,7 +158,6 @@ echo.
 <nul set /p="╚════════════════════════════════════════════════════════════════════════════════════╝" & echo.
 echo                            CosyVoice2-Ex WebUI 服务正在启动...
 echo                        https://github.com/journey-ad/CosyVoice2-Ex
-echo                               整合包制作: journey-ad
 echo.
 
 :: 设置基础路径
@@ -175,7 +174,7 @@ set PATH=%CONDA_ENV%\Scripts;%CONDA_ENV%\Library\bin;%PATH%
 
 :: 运行程序
 echo 正在启动WebUI服务，请稍候...
-python webui.py --port 8080 --open
+python webui.py --port 8080 --open --log_level INFO
 pause
 "@
 Set-Content -Path (Join-Path $OutputDir "运行-CosyVoice2-Ex.bat") -Value $webuiScript -Encoding UTF8
@@ -202,7 +201,6 @@ echo.
 <nul set /p="╚════════════════════════════════════════════════════════════════════════════════════╝" & echo.
 echo                           CosyVoice2-Ex API 服务正在启动...
 echo                      https://github.com/journey-ad/CosyVoice2-Ex
-echo                             整合包制作: journey-ad
 echo.
 
 :: 设置基础路径
