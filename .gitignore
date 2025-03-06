@@ -53,6 +53,9 @@ pretrained_models
 
 output.pt
 
+# conda environment
+env
+
 .history
 .build_temp
 !build_portable.ps1
