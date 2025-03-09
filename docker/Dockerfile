@@ -8,6 +8,10 @@ ENV DEBIAN_FRONTEN=noninteractive
 ENV PYTHONUNBUFFERED=1
 SHELL ["/bin/bash", "--login", "-c"]
 
+# 设置阿里云镜像源
+RUN sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list
+RUN sed -i 's/security.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list
+
 RUN apt-get update -y --fix-missing
 RUN apt-get install -y git build-essential curl wget ffmpeg unzip git git-lfs sox libsox-dev && \
     apt-get clean && \
@@ -26,7 +30,7 @@ RUN wget --quiet https://github.com/conda-forge/miniforge/releases/latest/downlo
     echo "conda activate ${VENV}" >> /opt/nvidia/entrypoint.d/110.conda_default_env.sh && \
     echo "conda activate ${VENV}" >> $HOME/.bashrc
 
-ENV PATH /opt/conda/bin:$PATH
+ENV PATH=/opt/conda/bin:$PATH
 
 RUN conda config --add channels conda-forge && \
     conda config --set channel_priority strict
@@ -36,16 +40,22 @@ RUN conda config --add channels conda-forge && \
 
 RUN conda create -y -n ${VENV} python=3.10
 ENV CONDA_DEFAULT_ENV=${VENV}
-ENV PATH /opt/conda/bin:/opt/conda/envs/${VENV}/bin:$PATH
+ENV PATH=/opt/conda/bin:/opt/conda/envs/${VENV}/bin:$PATH
 
 WORKDIR /workspace
 
-ENV PYTHONPATH="${PYTHONPATH}:/workspace/CosyVoice:/workspace/CosyVoice/third_party/Matcha-TTS"
+RUN export PYTHONPATH="${PYTHONPATH}:/workspace/CosyVoice:/workspace/CosyVoice/third_party/Matcha-TTS"
 
-RUN git clone --recursive https://github.com/FunAudioLLM/CosyVoice.git
+RUN git clone --recursive https://github.com/journey-ad/CosyVoice2-Ex.git
 
 RUN conda activate ${VENV} && conda install -y -c conda-forge pynini==2.1.5
-RUN conda activate ${VENV} && cd CosyVoice && \
+RUN conda activate ${VENV} && cd CosyVoice2-Ex && \
     pip install -r requirements.txt -i https://mirrors.aliyun.com/pypi/simple/ --trusted-host=mirrors.aliyun.com
 
-WORKDIR /workspace/CosyVoice
+WORKDIR /workspace/CosyVoice2-Ex
+
+ENV LOG_LEVEL=INFO
+
+EXPOSE 8080
+
+CMD ["sh", "-c", "python webui.py --port 8080 --log_level ${LOG_LEVEL}"]
