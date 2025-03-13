@@ -15,7 +15,6 @@ import torchaudio
 
 from cosyvoice.cli.cosyvoice import CosyVoice, CosyVoice2
 from cosyvoice.utils.file_utils import load_wav
-import torchaudio
 import ffmpeg
 
 from flask_cors import CORS
@@ -42,10 +41,19 @@ app = Flask(__name__)
 CORS(app, cors_allowed_origins="*")
 # CORS(app, supports_credentials=True)
 
-def process_audio(tts_speeches, sample_rate=22050, format="wav"):
+def process_audio(tts_speeches, sample_rate=16000, format="wav"):
     """处理音频数据并返回响应"""
     buffer = io.BytesIO()
     audio_data = torch.concat(tts_speeches, dim=1)
+
+    # 原始采样率（CosyVoice 默认为22050）
+    original_sr = 22050
+    
+    # 如果目标采样率与原始采样率不同，进行重采样
+    if sample_rate != original_sr:
+        resampler = torchaudio.transforms.Resample(orig_freq=original_sr, new_freq=sample_rate)
+        audio_data = resampler(audio_data)
+
     torchaudio.save(buffer, audio_data, sample_rate, format=format)
     buffer.seek(0)
     return buffer
@@ -82,6 +90,7 @@ def tts():
     instruct = params.get('instruct')
     streaming = int(params.get('streaming', 0))
     speed = float(params.get('speed', 1.0))
+    format = params.get('format', 'wav')
 
     # 验证必要参数
     if not text or not speaker:
@@ -117,7 +126,7 @@ def tts():
     
     # 处理非流式输出
     tts_speeches = [i['tts_speech'] for _, i in enumerate(inference_func())]
-    buffer = process_audio(tts_speeches, format="wav")
+    buffer = process_audio(tts_speeches, format=format)
     return create_audio_response(buffer)
 
 
