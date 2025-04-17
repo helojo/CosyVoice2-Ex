@@ -150,4 +150,4 @@ def speakers():
     return response
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=9880)
+    app.run(host='0.0.0.0', port=7860)

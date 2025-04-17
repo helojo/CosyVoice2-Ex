@@ -156,6 +156,25 @@ class CosyVoice:
         
         torch.save(model_input, save_path)
 
+        prompt_speech_22050 = torchaudio.transforms.Resample(orig_freq=16000, new_freq=22050)(prompt_speech_16k)
+        speech_feat, speech_feat_len = self.frontend._extract_speech_feat(prompt_speech_22050)
+        speech_token, speech_token_len = self.frontend._extract_speech_token(prompt_speech_16k)
+        embedding = self.frontend._extract_spk_embedding(prompt_speech_16k)
+        model_spk_input = {
+             'speech_token': speech_token,
+             'speech_feat': speech_feat,
+             'embedding': embedding
+        }
+        torch.save(model_spk_input, 'output2.pt')
+
+    def _merge_voice_model(self,spk_id,spk_path='output2.pt'):
+        spkidinfo = torch.load(spk_path)
+        spk2info_path = os.path.join(self.model_dir, 'spk2info.pt')
+        new_spk2info_path = os.path.join(self.model_dir, 'spk2info_new.pt')
+        spk2info = torch.load(spk2info_path)
+        spk2info[spk_id] = spkidinfo
+        torch.save(spk2info, new_spk2info_path)
+
     def inference_zero_shot(self, tts_text, prompt_text, prompt_speech_16k, stream=False, speed=1.0, text_frontend=True):
         prompt_text = self.frontend.text_normalize(prompt_text, split=False, text_frontend=text_frontend)
         

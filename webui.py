@@ -101,6 +101,22 @@ def save_voice_model(voice_name):
         logging.error(f"保存音色失败: {e}")
         gr.Warning("保存音色失败")
         return False
+    
+def merge_voice_model(voice_name):
+    """合并音色模型"""
+    if not voice_name:
+        gr.Info("音色名称不能为空")
+        return False
+        
+    try:
+        # shutil.copyfile(f"{ROOT_DIR}/output.pt", f"{ROOT_DIR}/voices/{voice_name}.pt")
+        cosyvoice._merge_voice_model(voice_name)
+        gr.Info("音色合并成功")
+        return True
+    except Exception as e:
+        logging.error(f"合并音色失败: {e}")
+        gr.Warning("合并音色失败")
+        return False
 
 def generate_random_seed():
     """生成随机种子"""
@@ -408,6 +424,7 @@ def main():
         with gr.Row(visible=False) as save_spk_btn:
             new_name = gr.Textbox(label="输入新的音色名称", lines=1, placeholder="输入新的音色名称.", value='', scale=2)
             save_button = gr.Button(value="保存音色模型", scale=1)
+            merge_button = gr.Button(value="合并音色模型", scale=1)
 
         # 生成按钮
         generate_button = gr.Button("生成音频")
@@ -438,6 +455,7 @@ def main():
         refresh_button.click(fn=refresh_prompt_wav, inputs=[], outputs=[wavs_dropdown])
         wavs_dropdown.change(change_prompt_wav, inputs=[wavs_dropdown], outputs=[prompt_wav_upload])
         save_button.click(save_voice_model, inputs=[new_name])
+        merge_button.click(merge_voice_model, inputs=[new_name])
         seed_button.click(generate_random_seed, inputs=[], outputs=[seed])
         
         generate_button.click(
